@@ -36,4 +36,4 @@ aiofiles==24.1.0
 # Utilities
 pyotp==2.9.0
 qrcode[pil]==8.0
-pillow==11.0.0
+pillow==12.2.0
