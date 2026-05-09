@@ -4,6 +4,7 @@ Revision ID: 002
 Revises: 001
 Create Date: 2026-05-07
 """
+import json
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
@@ -39,7 +40,7 @@ def upgrade() -> None:
     )
     # Backfill existing rows with the default checklist
     op.execute(
-        f"UPDATE engagements SET checklist = '{postgresql.json.json.dumps(DEFAULT_CHECKLIST)}'::jsonb"
+        f"UPDATE engagements SET checklist = '{json.dumps(DEFAULT_CHECKLIST)}'::jsonb"
     )
 
 
