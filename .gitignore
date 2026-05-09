@@ -1,0 +1,42 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+*.egg
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Engagement data — never committed
+engagements/
+
+# Local documentation / Obsidian vault
+Documentation/
+
+# SSL certs and generated nginx config (created by init-certs.sh)
+nginx/ssl/
+nginx/nginx.conf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+celerybeat-schedule
+
+# Docker volumes (if mounted locally during dev)
+postgres_data/
+redis_data/
