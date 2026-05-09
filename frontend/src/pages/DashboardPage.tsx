@@ -5,17 +5,6 @@ import { useEngagementStore } from '@/store/engagement'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { EngagementStatusBadge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import type { Severity } from '@/types'
-
-const SEVERITY_ORDER: Severity[] = ['critical', 'high', 'medium', 'low', 'info']
-
-const SEVERITY_COLORS: Record<Severity, string> = {
-  critical: 'text-red-400',
-  high:     'text-orange-400',
-  medium:   'text-yellow-400',
-  low:      'text-blue-400',
-  info:     'text-slate-400',
-}
 
 export function DashboardPage() {
   const navigate = useNavigate()
