@@ -13,6 +13,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+RUN chmod +x /app/entrypoint.sh
 
 # Non-root user
 RUN groupadd -r nova && useradd -r -g nova -d /app -s /sbin/nologin nova \
