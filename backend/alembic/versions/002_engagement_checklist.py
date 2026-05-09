@@ -35,7 +35,7 @@ def upgrade() -> None:
             "checklist",
             postgresql.JSONB,
             nullable=False,
-            server_default=sa.text(f"'{{}}'::jsonb"),
+            server_default=sa.text("jsonb_build_object()"),
         ),
     )
     # Backfill existing rows with the default checklist
