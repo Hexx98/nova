@@ -1,0 +1,3 @@
+[submodule "hexstrike"]
+	path = hexstrike
+	url = https://github.com/Hexx98/hexstrike-ai
