@@ -44,6 +44,8 @@ read -rp "> " POSTGRES_PASSWORD
 if [[ -z "$POSTGRES_PASSWORD" ]]; then
     POSTGRES_PASSWORD=$(openssl rand -hex 24)
     info "Generated PostgreSQL password: $POSTGRES_PASSWORD"
+elif [[ "$POSTGRES_PASSWORD" =~ [@:/] ]]; then
+    echo "ERROR: Password cannot contain @, : or / — these break the DATABASE_URL. Use auto-generate or choose a safe password."; exit 1
 fi
 
 # ── Redis ─────────────────────────────────────────────────────────────────────
@@ -52,6 +54,8 @@ read -rp "> " REDIS_PASSWORD
 if [[ -z "$REDIS_PASSWORD" ]]; then
     REDIS_PASSWORD=$(openssl rand -hex 24)
     info "Generated Redis password: $REDIS_PASSWORD"
+elif [[ "$REDIS_PASSWORD" =~ [@:/] ]]; then
+    echo "ERROR: Password cannot contain @, : or / — these break the REDIS_URL. Use auto-generate or choose a safe password."; exit 1
 fi
 
 # ── App secrets (always auto-generated) ──────────────────────────────────────
