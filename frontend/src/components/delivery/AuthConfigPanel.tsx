@@ -24,6 +24,7 @@ function Field({ label, name, value, type = 'text', placeholder, disabled, onCha
     <div>
       <label className="block text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">{label}</label>
       <input
+        name={name}
         type={type}
         value={value}
         disabled={disabled}

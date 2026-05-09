@@ -21,7 +21,7 @@ const TYPE_COLORS: Record<ScopeEntry['type'], string> = {
   url:    'bg-blue-500/10 text-blue-400 border-blue-500/20',
 }
 
-export function ScopeManager({ entries, onChange, saving }: ScopeManagerProps) {
+export function ScopeManager({ entries, onChange }: ScopeManagerProps) {
   const [adding, setAdding] = useState(false)
   const [draft, setDraft] = useState<ScopeEntry>({ target: '', type: 'domain', notes: '' })
 
