@@ -6,7 +6,8 @@ from typing import Any
 
 import pyotp
 import qrcode
-from jose import jwt, JWTError
+import jwt
+from jwt.exceptions import PyJWTError
 from passlib.context import CryptContext
 
 from app.config import get_settings
@@ -65,7 +66,7 @@ def create_temp_token(user_id: str) -> str:
 def decode_token(token: str) -> dict[str, Any]:
     try:
         return jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-    except JWTError:
+    except PyJWTError:
         return {}
 
 
