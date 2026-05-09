@@ -72,4 +72,5 @@ export const clearTokens = () => {
   localStorage.removeItem('nova_refresh_token')
 }
 
+export const apiClient = client
 export default client

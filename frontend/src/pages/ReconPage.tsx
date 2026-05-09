@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getEngagement, getPhases } from '@/api/engagements'
 import { getReconStatus, startRecon, approveTier5, pauseRecon, signOffRecon } from '@/api/recon'
 import { useEngagementStore } from '@/store/engagement'
@@ -8,7 +8,6 @@ import { useLiveFeed } from '@/hooks/useLiveFeed'
 import { ToolStatusList } from '@/components/phase/ToolStatusList'
 import { LiveFeed } from '@/components/phase/LiveFeed'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { RECON_TIERS } from '@/config/recon'
 import clsx from 'clsx'
 
@@ -44,9 +43,9 @@ export function ReconPage() {
     queryKey: ['recon-status', id],
     queryFn: () => getReconStatus(id!),
     enabled: !!id,
-    refetchInterval: (data) => {
-      // Poll every 3s while running
-      const hasRunning = data && Object.values(data.tool_status).some((s) => s.status === 'running')
+    refetchInterval: (query) => {
+      const d = query.state.data
+      const hasRunning = d && Object.values(d.tool_status).some((s) => s.status === 'running')
       return hasRunning ? 3000 : false
     },
   })

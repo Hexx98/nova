@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { weaponizationApi, type WordlistConfig, type AttackTask } from '@/api/weaponization'
+import { weaponizationApi, type WordlistConfig } from '@/api/weaponization'
 import { CVEReport } from '@/components/weaponization/CVEReport'
 import { AttackPlanBuilder } from '@/components/weaponization/AttackPlanBuilder'
 import { WordlistConfigPanel } from '@/components/weaponization/WordlistConfig'

@@ -24,6 +24,8 @@ export interface Engagement {
   loa_path: string | null
   roe_path: string | null
   folder_path: string | null
+  checklist?: Record<string, boolean>
+  rules_of_engagement?: Record<string, unknown>
   start_date: string | null
   end_date: string | null
   created_at: string

@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
 import { verifyTotp, getMe } from '@/api/auth'
-import { Button } from '@/components/ui/Button'
 
 export function TOTPVerifyPage() {
   const location = useLocation()

@@ -97,7 +97,7 @@ export function PreEngagementPage() {
   }
 
   function getScopeEntries(): ScopeEntry[] {
-    const raw = engagement.scope as { entries?: ScopeEntry[] }
+    const raw = engagement!.scope as { entries?: ScopeEntry[] }
     return raw?.entries ?? []
   }
 
