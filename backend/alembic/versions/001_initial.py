@@ -133,10 +133,8 @@ def upgrade() -> None:
     op.create_index("ix_artifact_logs_engagement_id", "artifact_logs", ["engagement_id"])
 
     # Immutable audit log — prevent UPDATE and DELETE at DB level
-    op.execute("""
-        CREATE RULE no_update_audit AS ON UPDATE TO audit_logs DO INSTEAD NOTHING;
-        CREATE RULE no_delete_audit AS ON DELETE TO audit_logs DO INSTEAD NOTHING;
-    """)
+    op.execute("CREATE RULE no_update_audit AS ON UPDATE TO audit_logs DO INSTEAD NOTHING;")
+    op.execute("CREATE RULE no_delete_audit AS ON DELETE TO audit_logs DO INSTEAD NOTHING;")
 
 
 def downgrade() -> None:
