@@ -169,26 +169,27 @@ async def start_recon(
     )
     await db.commit()
 
-    # Dispatch Tier 1 tasks immediately; subsequent tiers dispatched by the
-    # tier_complete signal logic (or via polling — full chaining wired in next iteration)
+    # Dispatch all Tiers 1-4 immediately (passive — no approval needed).
+    # Tier 5 requires explicit operator approval via /approve-tier5.
+    from app.tasks.recon import run_recon_tool
     for tier_def in RECON_TIERS:
-        if tier_def["tier"] == 1:
-            for tool in tier_def["tools"]:
-                if tool["name"] not in task_runs_by_tool:
-                    continue
-                task_id = str(task_runs_by_tool[tool["name"]])
-                kwargs = build_signed_kwargs({
-                    "engagement_id": str(engagement_id),
-                    "phase_id": str(phase.id),
-                    "task_run_id": task_id,
-                    "tool_name": tool["name"],
-                    "hexstrike_tool": tool["hexstrike_tool"],
-                    "tier": 1,
-                    "target": primary_target,
-                    "scope_hash": scope_h,
-                })
-                from app.tasks.recon import run_recon_tool
-                run_recon_tool.apply_async(kwargs=kwargs, queue="nova_tasks")
+        if tier_def["requires_approval"]:
+            continue
+        for tool in tier_def["tools"]:
+            if tool["name"] not in task_runs_by_tool:
+                continue
+            task_id = str(task_runs_by_tool[tool["name"]])
+            kwargs = build_signed_kwargs({
+                "engagement_id": str(engagement_id),
+                "phase_id": str(phase.id),
+                "task_run_id": task_id,
+                "tool_name": tool["name"],
+                "hexstrike_tool": tool["hexstrike_tool"],
+                "tier": tier_def["tier"],
+                "target": primary_target,
+                "scope_hash": scope_h,
+            })
+            run_recon_tool.apply_async(kwargs=kwargs, queue="nova_tasks")
 
     return {"status": "started", "tools_scheduled": len(task_runs_by_tool)}
 
