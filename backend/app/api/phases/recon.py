@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 
 from app.database import get_db
 from app.models.user import User
@@ -125,6 +125,9 @@ async def start_recon(
 
     if phase.status == PhaseStatus.in_progress:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Phase 1 already running")
+
+    # Clear any previous task runs so a restart starts clean
+    await db.execute(delete(TaskRun).where(TaskRun.phase_id == phase.id))
 
     scope_h = _scope_hash(eng.scope)
     targets = [e["target"] for e in eng.scope.get("entries", [])]
@@ -293,25 +296,27 @@ async def pause_recon(
     current_user: User = Depends(require_operator),
     db: AsyncSession = Depends(get_db),
 ):
-    """Revoke all running Celery tasks for Phase 1."""
+    """Revoke all running/pending Celery tasks for Phase 1 and reset phase to pending."""
     phase = await _get_phase_1(db, engagement_id)
 
-    running_result = await db.execute(
+    active_result = await db.execute(
         select(TaskRun).where(
             TaskRun.phase_id == phase.id,
-            TaskRun.status == TaskRunStatus.running,
+            TaskRun.status.in_([TaskRunStatus.running, TaskRunStatus.pending]),
         )
     )
-    running = running_result.scalars().all()
+    active = active_result.scalars().all()
 
-    for run in running:
+    for run in active:
         if run.celery_task_id:
             celery_app.control.revoke(run.celery_task_id, terminate=True)
         run.status = TaskRunStatus.cancelled
 
+    phase.status = PhaseStatus.pending
+
     await db.commit()
 
-    return {"paused": True, "tasks_cancelled": len(running)}
+    return {"paused": True, "tasks_cancelled": len(active)}
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────

@@ -103,6 +103,7 @@ export function ReconPage() {
     try {
       await pauseRecon(id)
       qc.invalidateQueries({ queryKey: ['recon-status', id] })
+      qc.invalidateQueries({ queryKey: ['phases', id] })
     } finally {
       setPausing(false)
     }
