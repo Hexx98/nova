@@ -188,7 +188,7 @@ async def start_recon(
                     "scope_hash": scope_h,
                 })
                 from app.tasks.recon import run_recon_tool
-                run_recon_tool.apply_async(kwargs=kwargs)
+                run_recon_tool.apply_async(kwargs=kwargs, queue="nova_tasks")
 
     return {"status": "started", "tools_scheduled": len(task_runs_by_tool)}
 
@@ -241,7 +241,7 @@ async def approve_tier_5(
             "scope_hash": scope_h,
         })
         from app.tasks.recon import run_recon_tool
-        run_recon_tool.apply_async(kwargs=kwargs)
+        run_recon_tool.apply_async(kwargs=kwargs, queue="nova_tasks")
         dispatched += 1
 
     await audit_log.log(
