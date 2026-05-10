@@ -101,8 +101,9 @@ def _extract_tech_stack(phase: Phase) -> list[str]:
 
 
 def _extract_scope_hosts(engagement: Engagement) -> list[str]:
-    scope = engagement.scope or []
-    return [s.get("value", "") for s in scope if s.get("type") == "domain"]
+    scope = engagement.scope or {}
+    entries = scope.get("entries", []) if isinstance(scope, dict) else []
+    return [s.get("target", "") for s in entries if isinstance(s, dict) and s.get("type") == "domain"]
 
 
 # ---------------------------------------------------------------------------
