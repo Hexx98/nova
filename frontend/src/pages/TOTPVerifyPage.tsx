@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
 import { verifyTotp, getMe } from '@/api/auth'
+import { setAccessToken } from '@/api/client'
 
 export function TOTPVerifyPage() {
   const location = useLocation()
@@ -43,6 +44,7 @@ export function TOTPVerifyPage() {
     setLoading(true)
     try {
       const tokens = await verifyTotp(tempToken!, code)
+      setAccessToken(tokens.access_token)
       const user = await getMe()
       setSession(tokens.access_token, tokens.refresh_token, user)
       navigate('/dashboard', { replace: true })
