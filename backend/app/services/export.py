@@ -26,7 +26,7 @@ from app.models.audit import ArtifactLog, ArtifactStatus
 from app.models.c2_session import C2Session
 from app.models.objectives import EngagementObjectives
 from app.models.user import User
-from app.services.masking import mask
+from app.services.masking import apply as mask
 
 EXPORT_VERSION = "1.0"
 
