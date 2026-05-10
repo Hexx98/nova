@@ -86,6 +86,7 @@ async def create_engagement(
         details={"name": body.name, "target": body.target_domain},
     )
 
+    await db.refresh(engagement)
     return engagement
 
 
@@ -293,6 +294,7 @@ async def create_finding(
         engagement_id=engagement_id, user_id=current_user.id,
         details={"title": body.title, "severity": body.severity},
     )
+    await db.refresh(finding)
     return finding
 
 
