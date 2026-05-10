@@ -11,6 +11,7 @@ celery_app = Celery(
     "nova",
     broker=settings.redis_url,
     backend=settings.redis_url,
+    include=["app.tasks.recon", "app.tasks.delivery", "app.tasks.exploitation"],
 )
 
 celery_app.conf.update(
