@@ -60,7 +60,8 @@ class HexStrikeClient:
         Parameters: send both "domain" and "target" so tools that use either name work.
         """
         target = args.get("target", "")
-        payload = {**args, "domain": target, "target": target}
+        url = target if target.startswith("http") else f"https://{target}"
+        payload = {**args, "domain": target, "target": target, "url": url}
 
         try:
             response = await self._client.post(
