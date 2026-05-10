@@ -1,3 +1,4 @@
+import uuid
 from pydantic import BaseModel, EmailStr
 
 
@@ -36,7 +37,7 @@ class RefreshRequest(BaseModel):
 
 
 class UserMe(BaseModel):
-    id: str
+    id: uuid.UUID
     email: str
     full_name: str
     role: str
