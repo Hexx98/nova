@@ -122,7 +122,7 @@ async def _run_tool_async(*, task_id, engagement_id, phase_id, task_run_id,
             })
             return
 
-        if not _target_in_scope(target, engagement.scope):
+        if target != engagement.target_domain and not _target_in_scope(target, engagement.scope):
             task_run.status = TaskRunStatus.error
             task_run.error_message = f"Target {target} is not in scope — rejected at worker"
             await db.commit()
