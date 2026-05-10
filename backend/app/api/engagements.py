@@ -117,6 +117,7 @@ async def update_engagement(
         engagement_id=engagement_id, user_id=current_user.id,
         details=body.model_dump(exclude_none=True),
     )
+    await db.refresh(engagement)
     return engagement
 
 
@@ -320,6 +321,7 @@ async def update_finding(
         db, "finding_updated", "finding", str(finding_id),
         engagement_id=engagement_id, user_id=current_user.id,
     )
+    await db.refresh(finding)
     return finding
 
 
@@ -347,6 +349,7 @@ async def confirm_finding(
         db, "finding_confirmed", "finding", str(finding_id),
         engagement_id=engagement_id, user_id=current_user.id,
     )
+    await db.refresh(finding)
     return finding
 
 
@@ -377,6 +380,7 @@ async def update_checklist(
         engagement_id=engagement_id, user_id=current_user.id,
         details={"updated_keys": list(filtered.keys())},
     )
+    await db.refresh(engagement)
     return engagement
 
 
