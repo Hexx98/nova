@@ -35,8 +35,13 @@ export function EngagementDetailPage() {
 
   useEffect(() => {
     if (engagement) setActiveEngagement(engagement)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engagement?.id])
+
+  useEffect(() => {
     if (phases.length) setPhases(phases)
-  }, [engagement, phases, setActiveEngagement, setPhases])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phases.length])
 
   if (!engagement) {
     return (

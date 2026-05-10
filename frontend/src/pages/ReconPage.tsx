@@ -54,8 +54,13 @@ export function ReconPage() {
 
   useEffect(() => {
     if (engagement) setActiveEngagement(engagement)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engagement?.id])
+
+  useEffect(() => {
     if (phases.length) setPhases(phases)
-  }, [engagement, phases, setActiveEngagement, setPhases])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phases.length])
 
   const phase1 = phases.find((p) => p.phase_number === 1)
   const isRunning = phase1?.status === 'in_progress'

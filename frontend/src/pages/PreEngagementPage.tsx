@@ -38,11 +38,16 @@ export function PreEngagementPage() {
     enabled: !!id,
   })
 
-  // Sync active engagement and phases to store
+  // Sync active engagement and phases to store — depend on ID/count, not object references
   useEffect(() => {
     if (engagement) setActiveEngagement(engagement)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engagement?.id])
+
+  useEffect(() => {
     if (phases.length) setPhases(phases)
-  }, [engagement, phases, setActiveEngagement, setPhases])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phases.length])
 
   const checklistMut = useMutation({
     mutationFn: (items: Record<string, boolean>) => updateChecklist(id!, items),
