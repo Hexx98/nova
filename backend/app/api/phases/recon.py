@@ -320,6 +320,68 @@ async def pause_recon(
     return {"paused": True, "tasks_cancelled": len(active)}
 
 
+@router.get("/tech-stack")
+async def detect_tech_stack(
+    engagement_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Parse output files from fingerprinting tools to suggest a tech stack
+    for the Phase 1 sign-off dialog.
+    """
+    eng = await _get_engagement(db, engagement_id, current_user)
+    phase = await _get_phase_1(db, engagement_id)
+
+    # Load output paths from fingerprinting tool runs
+    fingerprint_tools = {"whatweb", "wappalyzer", "httpx", "wafw00f", "wpscan"}
+    runs_result = await db.execute(
+        select(TaskRun).where(
+            TaskRun.phase_id == phase.id,
+            TaskRun.status == TaskRunStatus.complete,
+        )
+    )
+    runs = [r for r in runs_result.scalars().all() if r.tool_name.lower() in fingerprint_tools]
+
+    # Known tech keywords to scan for (lowercase)
+    TECH_KEYWORDS = [
+        "nginx", "apache", "iis", "caddy", "lighttpd",
+        "react", "vue", "angular", "next.js", "nuxt",
+        "node", "node.js", "express",
+        "php", "laravel", "symfony", "wordpress", "drupal", "joomla",
+        "python", "django", "flask", "fastapi",
+        "ruby", "rails",
+        "java", "spring", "tomcat",
+        "jquery", "bootstrap", "tailwind",
+        "graphql", "rest",
+        "mysql", "postgres", "mongodb", "redis",
+        "cloudflare", "aws", "azure", "gcp",
+        "docker", "kubernetes",
+        "ssl", "tls", "lets encrypt",
+        "waf", "cdn",
+    ]
+
+    detected = set()
+    for run in runs:
+        if not run.output_path:
+            continue
+        try:
+            with open(run.output_path) as f:
+                content = f.read().lower()
+            for kw in TECH_KEYWORDS:
+                if kw in content:
+                    detected.add(kw)
+        except OSError:
+            continue
+
+    # Also include tech stack from phase context if already set
+    existing = phase.context.get("tech_stack", []) if phase.context else []
+    for t in existing:
+        detected.add(t.lower())
+
+    return {"tech_stack": sorted(detected)}
+
+
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 async def _get_engagement(db: AsyncSession, engagement_id: uuid.UUID, user: User) -> Engagement:

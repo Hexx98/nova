@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getEngagement, getPhases } from '@/api/engagements'
-import { getReconStatus, startRecon, approveTier5, pauseRecon, signOffRecon } from '@/api/recon'
+import { getReconStatus, startRecon, approveTier5, pauseRecon, signOffRecon, detectTechStack } from '@/api/recon'
 import { useEngagementStore } from '@/store/engagement'
 import { useLiveFeed } from '@/hooks/useLiveFeed'
 import { ToolStatusList } from '@/components/phase/ToolStatusList'
@@ -25,7 +25,8 @@ export function ReconPage() {
   const [pausing, setPausing] = useState(false)
   const [signingOff, setSigningOff] = useState(false)
   const [showSignOffDialog, setShowSignOffDialog] = useState(false)
-  const [techStackInput, setTechStackInput] = useState('nginx, php, jquery')
+  const [techStackInput, setTechStackInput] = useState('')
+  const [detectingTech, setDetectingTech] = useState(false)
 
   const { data: engagement } = useQuery({
     queryKey: ['engagement', id],
@@ -165,7 +166,23 @@ export function ReconPage() {
             </Button>
           )}
           {allComplete && !isComplete && (
-            <Button className="w-full" size="sm" onClick={() => setShowSignOffDialog(true)}>
+            <Button
+              className="w-full"
+              size="sm"
+              loading={detectingTech}
+              onClick={async () => {
+                setDetectingTech(true)
+                try {
+                  const { tech_stack } = await detectTechStack(id!)
+                  setTechStackInput(tech_stack.join(', '))
+                } catch {
+                  setTechStackInput('')
+                } finally {
+                  setDetectingTech(false)
+                  setShowSignOffDialog(true)
+                }
+              }}
+            >
               ✓ Sign Off Phase 1
             </Button>
           )}

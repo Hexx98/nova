@@ -42,6 +42,11 @@ export async function pauseRecon(engagementId: string) {
   return data
 }
 
+export async function detectTechStack(engagementId: string): Promise<{ tech_stack: string[] }> {
+  const { data } = await client.get(`/engagements/${engagementId}/phases/1/recon/tech-stack`)
+  return data
+}
+
 export async function signOffRecon(engagementId: string, techStack: string[], notes?: string) {
   const { data } = await client.post(
     `/engagements/${engagementId}/phases/1/recon/sign-off`,
