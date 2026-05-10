@@ -53,45 +53,45 @@ class HexStrikeClient:
         apply_masking: bool = True,
     ) -> AsyncGenerator[str, None]:
         """
-        Stream output lines from a HexStrike tool execution.
+        Call a HexStrike tool endpoint and yield output lines.
 
-        Masking is applied here — raw output never leaves this generator.
-        Each yielded string is one masked output line.
-
-        The HexStrike SSE endpoint is: POST /tools/{tool_name}/run
-        with args in the request body.
+        HexStrike returns plain JSON: {"stdout": "...", "stderr": "...", "returncode": N, ...}
+        Endpoint: POST /api/tools/{tool_name}
+        Parameters: send both "domain" and "target" so tools that use either name work.
         """
+        target = args.get("target", "")
+        payload = {**args, "domain": target, "target": target}
+
         try:
-            async with self._client.stream(
-                "POST",
-                f"/tools/{tool_name}/run",
-                json=args,
-                headers={"Accept": "text/event-stream"},
-            ) as response:
-                response.raise_for_status()
+            response = await self._client.post(
+                f"/api/tools/{tool_name}",
+                json=payload,
+            )
+            response.raise_for_status()
 
-                async for raw_line in response.aiter_lines():
-                    if not raw_line:
-                        continue
+            data = response.json()
 
-                    # SSE format: "data: <payload>"
-                    if raw_line.startswith("data: "):
-                        payload = raw_line[6:]
-                        try:
-                            data = json.loads(payload)
-                            line = data.get("output", payload)
-                        except json.JSONDecodeError:
-                            line = payload
+            # Emit stdout lines
+            stdout = data.get("stdout", "") or data.get("output", "")
+            for raw_line in stdout.splitlines():
+                raw_line = raw_line.strip()
+                if raw_line:
+                    yield masking.apply(raw_line) if apply_masking else raw_line
 
-                        yield masking.apply(line) if apply_masking else line
+            # Emit stderr lines prefixed so they're visible but distinguishable
+            stderr = data.get("stderr", "")
+            for raw_line in stderr.splitlines():
+                raw_line = raw_line.strip()
+                if raw_line:
+                    line = f"[stderr] {raw_line}"
+                    yield masking.apply(line) if apply_masking else line
 
         except httpx.ConnectError:
-            # HexStrike not yet running — dev mode fallback
             async for line in _dev_fallback(tool_name, args):
                 yield masking.apply(line) if apply_masking else line
 
         except Exception as e:
-            yield f"[ERROR] {tool_name}: {e}"
+            yield f"[{tool_name}][ERROR] {tool_name}: {e}"
 
 
 async def _dev_fallback(tool_name: str, args: dict) -> AsyncGenerator[str, None]:
