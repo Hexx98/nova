@@ -64,16 +64,16 @@ export interface PlanResponse {
 
 export const weaponizationApi = {
   getPlan: (engagementId: string): Promise<PlanResponse> =>
-    apiClient.get(`/api/engagements/${engagementId}/phases/2/plan`).then(r => r.data),
+    apiClient.get(`/engagements/${engagementId}/phases/2/plan`).then(r => r.data),
 
   generatePlan: (engagementId: string): Promise<PlanResponse> =>
-    apiClient.post(`/api/engagements/${engagementId}/phases/2/plan/generate`).then(r => r.data),
+    apiClient.post(`/engagements/${engagementId}/phases/2/plan/generate`).then(r => r.data),
 
   updatePlan: (
     engagementId: string,
     body: { items?: AttackTask[]; operator_notes?: string; wordlist_config?: WordlistConfig; mode?: string }
   ) =>
-    apiClient.patch(`/api/engagements/${engagementId}/phases/2/plan`, body).then(r => r.data),
+    apiClient.patch(`/engagements/${engagementId}/phases/2/plan`, body).then(r => r.data),
 
   updateTask: (
     engagementId: string,
@@ -81,17 +81,17 @@ export const weaponizationApi = {
     body: { enabled?: boolean; priority?: string; params?: Record<string, unknown>; notes?: string }
   ) =>
     apiClient
-      .patch(`/api/engagements/${engagementId}/phases/2/plan/tasks/${taskId}`, body)
+      .patch(`/engagements/${engagementId}/phases/2/plan/tasks/${taskId}`, body)
       .then(r => r.data),
 
   approvePlan: (engagementId: string, notes?: string) =>
     apiClient
-      .post(`/api/engagements/${engagementId}/phases/2/plan/approve`, { notes })
+      .post(`/engagements/${engagementId}/phases/2/plan/approve`, { notes })
       .then(r => r.data),
 
   resetPlan: (engagementId: string) =>
-    apiClient.post(`/api/engagements/${engagementId}/phases/2/plan/reset`).then(r => r.data),
+    apiClient.post(`/engagements/${engagementId}/phases/2/plan/reset`).then(r => r.data),
 
   getCveReport: (engagementId: string): Promise<CveReport> =>
-    apiClient.get(`/api/engagements/${engagementId}/phases/2/cve-report`).then(r => r.data),
+    apiClient.get(`/engagements/${engagementId}/phases/2/cve-report`).then(r => r.data),
 }
