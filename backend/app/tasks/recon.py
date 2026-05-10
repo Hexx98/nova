@@ -18,13 +18,15 @@ import asyncio
 import hashlib
 import json
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from uuid import UUID
 
 import redis as sync_redis
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.pool import NullPool
 
 from app.worker import celery_app, NovaTask
-from app.database import AsyncSessionLocal
 from app.models.task_run import TaskRun, TaskRunStatus
 from app.models.engagement import Engagement
 from app.services.hexstrike import HexStrikeClient
@@ -35,6 +37,22 @@ settings = get_settings()
 
 # Synchronous Redis client for use inside Celery worker tasks
 _redis = sync_redis.from_url(settings.redis_url, decode_responses=True)
+
+
+@asynccontextmanager
+async def _task_db():
+    """Per-task DB session using NullPool — avoids event loop conflicts with asyncio.run()."""
+    engine = create_async_engine(settings.database_url, poolclass=NullPool)
+    factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async with factory() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await engine.dispose()
 
 LIVE_CHANNEL = "nova:live:{engagement_id}"
 
@@ -79,7 +97,7 @@ def run_recon_tool(self, *, engagement_id: str, phase_id: str, task_run_id: str,
 
 async def _run_tool_async(*, task_id, engagement_id, phase_id, task_run_id,
                           tool_name, hexstrike_tool, tier, target, scope_hash):
-    async with AsyncSessionLocal() as db:
+    async with _task_db() as db:
         # Load records
         run_result = await db.execute(select(TaskRun).where(TaskRun.id == task_run_id))
         task_run = run_result.scalar_one_or_none()
