@@ -162,7 +162,7 @@ async def _run_crawl_async(
     from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
     from sqlalchemy.orm import sessionmaker
     from app.models.delivery_config import DeliveryConfig, DeliveryStatus
-    from app.services.masking import mask
+    from app.services.masking import apply as mask
     from app.services.hexstrike import HexStrikeClient
     from datetime import datetime, timezone
     import hashlib, json
