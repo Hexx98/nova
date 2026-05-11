@@ -22,19 +22,19 @@ export interface C2Session {
 
 export const c2Api = {
   list: (id: string) =>
-    apiClient.get(`/api/engagements/${id}/phases/6/sessions`).then(r => r.data),
+    apiClient.get(`/engagements/${id}/phases/6/sessions`).then(r => r.data),
 
   create: (id: string, body: {
     channel_type: C2ChannelType; label: string; callback_url: string; notes?: string
-  }) => apiClient.post(`/api/engagements/${id}/phases/6/sessions`, body).then(r => r.data),
+  }) => apiClient.post(`/engagements/${id}/phases/6/sessions`, body).then(r => r.data),
 
   logInteraction: (id: string, sessionId: string, body: {
     source_ip?: string; method?: string; data_preview?: string; size_bytes?: number
-  }) => apiClient.post(`/api/engagements/${id}/phases/6/sessions/${sessionId}/interaction`, body).then(r => r.data),
+  }) => apiClient.post(`/engagements/${id}/phases/6/sessions/${sessionId}/interaction`, body).then(r => r.data),
 
   terminate: (id: string, sessionId: string) =>
-    apiClient.post(`/api/engagements/${id}/phases/6/sessions/${sessionId}/terminate`).then(r => r.data),
+    apiClient.post(`/engagements/${id}/phases/6/sessions/${sessionId}/terminate`).then(r => r.data),
 
   signOff: (id: string, notes?: string) =>
-    apiClient.post(`/api/engagements/${id}/phases/6/sign-off`, { notes }).then(r => r.data),
+    apiClient.post(`/engagements/${id}/phases/6/sign-off`, { notes }).then(r => r.data),
 }

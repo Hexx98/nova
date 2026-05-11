@@ -39,11 +39,11 @@ export interface ExportPreview {
 
 export const exportApi = {
   preview: (engagementId: string): Promise<ExportPreview> =>
-    apiClient.get(`/api/engagements/${engagementId}/export/preview`).then(r => r.data),
+    apiClient.get(`/engagements/${engagementId}/export/preview`).then(r => r.data),
 
   download: (engagementId: string) =>
     apiClient
-      .get(`/api/engagements/${engagementId}/export/download`, { responseType: 'blob' })
+      .get(`/engagements/${engagementId}/export/download`, { responseType: 'blob' })
       .then(r => {
         const disposition = r.headers['content-disposition'] ?? ''
         const match = disposition.match(/filename="([^"]+)"/)
@@ -61,6 +61,6 @@ export const exportApi = {
     body?: { titanux_url?: string; api_key?: string }
   ): Promise<{ pushed: boolean; titanux_url: string; finding_count: number; exported_at: string; titanux_response: unknown }> =>
     apiClient
-      .post(`/api/engagements/${engagementId}/export/push`, body ?? {})
+      .post(`/engagements/${engagementId}/export/push`, body ?? {})
       .then(r => r.data),
 }

@@ -26,7 +26,7 @@ export interface EngagementObjectives {
 
 export const objectivesApi = {
   get: (id: string) =>
-    apiClient.get(`/api/engagements/${id}/phases/7/objectives`).then(r => r.data),
+    apiClient.get(`/engagements/${id}/phases/7/objectives`).then(r => r.data),
 
   save: (id: string, body: Partial<{
     achieved_objectives: ObjectiveEntry[]
@@ -35,11 +35,11 @@ export const objectivesApi = {
     executive_summary: string
     remediation_plan: EngagementObjectives['remediation_plan']
     operator_notes: string
-  }>) => apiClient.put(`/api/engagements/${id}/phases/7/objectives`, body).then(r => r.data),
+  }>) => apiClient.put(`/engagements/${id}/phases/7/objectives`, body).then(r => r.data),
 
   autoPopulate: (id: string) =>
-    apiClient.post(`/api/engagements/${id}/phases/7/objectives/auto-populate`).then(r => r.data),
+    apiClient.post(`/engagements/${id}/phases/7/objectives/auto-populate`).then(r => r.data),
 
   signOff: (id: string, notes?: string) =>
-    apiClient.post(`/api/engagements/${id}/phases/7/sign-off`, { notes }).then(r => r.data),
+    apiClient.post(`/engagements/${id}/phases/7/sign-off`, { notes }).then(r => r.data),
 }
