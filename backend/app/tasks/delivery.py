@@ -225,6 +225,15 @@ async def _run_crawl_async(
                     "line": f"[sim] {entry['method']} {entry['url']} [{entry['status_code']}]",
                 })
 
+        if not discovered:
+            log.warning("No URLs discovered by %s (tool exited cleanly but empty), using simulated data", tool)
+            discovered = _simulated_crawl(target, seed_urls)
+            for entry in discovered:
+                _publish(engagement_id, {
+                    "type": "tool_output", "tool": "crawl", "tier": 3,
+                    "line": f"[sim] {entry['method']} {entry['url']} [{entry['status_code']}]",
+                })
+
         # Deduplicate by URL+method
         seen = set()
         unique = []
