@@ -90,6 +90,38 @@ export function ObjectivesPage() {
   const editable    = !isSignedOff
   const findingSummary = data?.finding_summary ?? {}
 
+  function generateImpactNarrative() {
+    const counts = findingSummary as Record<string, number>
+    const total = Object.values(counts).reduce((a, b) => a + b, 0)
+    const parts: string[] = []
+    for (const sev of ['critical', 'high', 'medium', 'low', 'info']) {
+      if (counts[sev]) parts.push(`${counts[sev]} ${sev}`)
+    }
+    const sevLine = parts.length ? `Severity breakdown: ${parts.join(', ')}.` : ''
+    const impactDesc = IMPACT_OPTIONS.find(o => o.value === draft.business_impact)?.description ?? ''
+    const objLines = draft.achieved_objectives.length
+      ? '\n\nKey attack objectives achieved:\n' + draft.achieved_objectives.map(o => `- ${o.title}: ${o.description}`).join('\n')
+      : ''
+    const narrative = `Automated security testing identified ${total} confirmed vulnerabilit${total === 1 ? 'y' : 'ies'} across the target application. ${sevLine}${objLines}\n\nBusiness impact: ${draft.business_impact ?? 'not assessed'}${impactDesc ? ` — ${impactDesc}` : ''}.`
+    update('impact_narrative', narrative)
+  }
+
+  function generateExecutiveSummary() {
+    const counts = findingSummary as Record<string, number>
+    const total = Object.values(counts).reduce((a, b) => a + b, 0)
+    const critical = counts['critical'] ?? 0
+    const high = counts['high'] ?? 0
+    const cats = [...new Set(draft.achieved_objectives.map(o => o.type.replace(/_/g, ' ')))].slice(0, 4)
+    const catLine = cats.length ? ` The assessment covered attack categories including ${cats.join(', ')}.` : ''
+    const riskLine = critical > 0
+      ? `Critical vulnerabilities were identified that could allow full system compromise or unauthorised data access.`
+      : high > 0
+        ? `High severity vulnerabilities were identified posing significant risk to the organisation.`
+        : `No critical or high severity vulnerabilities were identified during this assessment.`
+    const summary = `A web application security assessment was conducted against the target, identifying ${total} confirmed vulnerabilit${total === 1 ? 'y' : 'ies'}${critical + high > 0 ? `, including ${[critical ? `${critical} critical` : '', high ? `${high} high` : ''].filter(Boolean).join(' and ')} severity issues` : ''}. ${riskLine}${catLine} Immediate remediation is recommended for all critical and high severity findings to reduce organisational risk exposure.`
+    update('executive_summary', summary)
+  }
+
   const TABS: { id: Tab; label: string }[] = [
     { id: 'objectives', label: 'Objectives' },
     { id: 'impact',     label: 'Impact Assessment' },
@@ -227,7 +259,15 @@ export function ObjectivesPage() {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Technical Impact Narrative</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-medium text-slate-400 uppercase tracking-wide">Technical Impact Narrative</label>
+              {editable && (
+                <button onClick={generateImpactNarrative}
+                  className="text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-800 rounded px-2 py-0.5 transition-colors">
+                  ⚡ Auto-generate from findings
+                </button>
+              )}
+            </div>
             <textarea value={draft.impact_narrative} disabled={!editable}
               onChange={e => update('impact_narrative', e.target.value)} rows={8}
               placeholder="Detailed technical description of what was accessed, how, and what data or systems were compromised…"
@@ -239,9 +279,17 @@ export function ObjectivesPage() {
       {/* Executive summary tab */}
       {tab === 'summary' && (
         <div className="space-y-4">
-          <p className="text-sm text-slate-400">
-            Write a clear, non-technical summary for executive/management audience. Avoid jargon. Focus on business risk and recommended actions.
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-400">
+              Clear, non-technical summary for executive/management audience. Focus on business risk and recommended actions.
+            </p>
+            {editable && (
+              <button onClick={generateExecutiveSummary}
+                className="flex-shrink-0 ml-4 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-800 rounded px-2 py-0.5 transition-colors">
+                ⚡ Auto-generate
+              </button>
+            )}
+          </div>
           <textarea value={draft.executive_summary} disabled={!editable}
             onChange={e => update('executive_summary', e.target.value)} rows={14}
             placeholder="During the security assessment of [target], our team identified several critical vulnerabilities that pose significant risk to [organisation]…"
