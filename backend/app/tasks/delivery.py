@@ -189,7 +189,7 @@ async def _run_crawl_async(
                 config.status = DeliveryStatus.pending
                 config.crawl_stats = {"error": "scope_changed"}
                 await db.commit()
-                _publish(engagement_id, {"type": "error", "message": "Crawl aborted: scope changed since dispatch"})
+                _publish(engagement_id, {"type": "tool_status", "tool": "crawl", "status": "error", "error": "Crawl aborted: scope changed since dispatch"})
                 return
 
         config.status = DeliveryStatus.crawling
@@ -212,7 +212,7 @@ async def _run_crawl_async(
             async with HexStrikeClient() as hs:
                 async for raw_line in hs.stream_tool(tool, hexstrike_args):
                     masked = mask(raw_line)
-                    _publish(engagement_id, {"type": "line", "tool": "crawl", "line": masked})
+                    _publish(engagement_id, {"type": "tool_output", "tool": "crawl", "tier": 3, "line": masked})
                     entry = _parse_crawl_line(raw_line, base_url)
                     if entry:
                         discovered.append(entry)
@@ -221,7 +221,7 @@ async def _run_crawl_async(
             discovered = _simulated_crawl(target, seed_urls)
             for entry in discovered:
                 _publish(engagement_id, {
-                    "type": "line", "tool": "crawl",
+                    "type": "tool_output", "tool": "crawl", "tier": 3,
                     "line": f"[sim] {entry['method']} {entry['url']} [{entry['status_code']}]",
                 })
 
