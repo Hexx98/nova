@@ -267,7 +267,7 @@ async def start_crawl(
     })
 
     from app.tasks.delivery import run_delivery_crawl
-    task = run_delivery_crawl.apply_async(kwargs=kwargs)
+    task = run_delivery_crawl.apply_async(kwargs=kwargs, queue="nova_tasks")
 
     cfg.status = DeliveryStatus.crawling
     cfg.started_at = datetime.now(timezone.utc)
