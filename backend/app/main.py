@@ -53,11 +53,6 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
-app.include_router(engagements.router)
-app.include_router(users.router)
-app.include_router(audit.router)
-app.include_router(export.router)
-app.include_router(attack_coverage.router)
 app.include_router(recon.router)
 app.include_router(weaponization.router)
 app.include_router(delivery.router)
@@ -65,6 +60,11 @@ app.include_router(exploitation.router)
 app.include_router(installation.router)
 app.include_router(c2.router)
 app.include_router(objectives.router)
+app.include_router(engagements.router)
+app.include_router(users.router)
+app.include_router(audit.router)
+app.include_router(export.router)
+app.include_router(attack_coverage.router)
 app.include_router(ws.router)
 
 
