@@ -22,6 +22,7 @@ celery_app.conf.update(
     task_acks_late=True,          # only ack after task completes
     worker_prefetch_multiplier=1, # one task at a time per worker thread
     worker_hijack_root_logger=False,
+    task_default_queue="nova_tasks",
     task_routes={"nova.tasks.*": {"queue": "nova_tasks"}},
 )
 
