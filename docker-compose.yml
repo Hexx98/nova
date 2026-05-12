@@ -39,6 +39,7 @@ services:
     environment:
       HEXSTRIKE_MODE: nova_controlled
       HEXSTRIKE_PORT: 9000
+      HEXSTRIKE_HOST: 0.0.0.0
     networks:
       - nova_net
     volumes:
@@ -51,6 +52,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-nova}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-nova}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
@@ -91,6 +94,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: celery -A app.worker worker --loglevel=info --concurrency=4 -Q nova_tasks
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-nova}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-nova}
