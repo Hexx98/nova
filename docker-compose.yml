@@ -30,23 +30,17 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # HexStrike AI — tool execution backend (Hexx98/hexstrike-ai submodule)
+  # Nova Tool Runner — lightweight security tool execution service
   # No host ports exposed — accessible only on nova_net
   hexstrike:
     build:
-      context: ./hexstrike
+      context: ./toolrunner
       dockerfile: Dockerfile
-    environment:
-      HEXSTRIKE_MODE: nova_controlled
-      HEXSTRIKE_PORT: 9000
-      HEXSTRIKE_HOST: 0.0.0.0
     networks:
       - nova_net
     volumes:
       - wordlists:/wordlists:ro
-      - hexstrike_output:/output
     restart: unless-stopped
-    user: hexstrike
 
   backend:
     build:
