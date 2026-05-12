@@ -5,7 +5,6 @@ WORKDIR /app
 # System packages
 RUN apt-get update && apt-get install -y \
     curl wget git nmap whois unzip perl \
-    ruby ruby-dev libcurl4-openssl-dev libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Go — GOPATH set to /go so binaries land in /go/bin (on PATH)
@@ -51,8 +50,7 @@ RUN curl -sL https://github.com/drwetter/testssl.sh/archive/refs/heads/3.2.zip \
     && mv /tmp/testssl.sh-3.2/testssl.sh /usr/local/bin/testssl.sh \
     && chmod +x /usr/local/bin/testssl.sh && rm -rf /tmp/testssl*
 
-# wpscan
-RUN gem install wpscan --no-document
+# wpscan — install manually after build if needed: gem install wpscan --no-document
 
 # SecLists common wordlist
 RUN mkdir -p /wordlists \
