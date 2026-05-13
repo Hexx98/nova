@@ -26,6 +26,8 @@ RUN go install github.com/projectdiscovery/dnsx/cmd/dnsx@latest
 
 # Python tools
 RUN pip install --no-cache-dir flask httpx sqlmap wafw00f
+# Restore Go httpx binary — pip httpx installs a conflicting 'httpx' CLI wrapper
+RUN ln -sf /go/bin/httpx /usr/local/bin/httpx
 
 # nikto
 RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto \
