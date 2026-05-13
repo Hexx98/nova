@@ -110,6 +110,7 @@ def gobuster():
         "gobuster", "dir", "-u", url,
         "-w", "/wordlists/common.txt",
         "-q", "--no-progress", "-t", "20",
+        "--wildcard",
     ], timeout=180))
 
 
@@ -123,6 +124,7 @@ def feroxbuster():
         "--depth", depth, "--no-state",
         "-t", "20", "--timeout", "10",
         "--quiet",
+        "-w", "/wordlists/common.txt",
     ], timeout=180))
 
 
@@ -167,7 +169,7 @@ def nmap():
 @app.post("/api/tools/dnsx")
 def dnsx():
     domain = d().get("domain") or d().get("target", "")
-    return jsonify(run(["dnsx", "-d", domain, "-silent", "-a", "-mx", "-ns"], timeout=60))
+    return jsonify(run(["dnsx", "-l", "/dev/stdin", "-silent", "-a", "-mx", "-ns"], timeout=60, stdin_data=domain))
 
 
 @app.post("/api/tools/testssl")
