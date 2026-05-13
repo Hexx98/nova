@@ -5,6 +5,7 @@ WORKDIR /app
 # System packages
 RUN apt-get update && apt-get install -y \
     curl wget git nmap whois unzip perl \
+    libxml-writer-perl libjson-perl \
     && rm -rf /var/lib/apt/lists/*
 
 # Go — GOPATH set to /go so binaries land in /go/bin (on PATH)
